@@ -199,7 +199,8 @@ RUN set -ux \
                                     openssl-dev \
                                     python2-dev \
  && apk del .build-deps-py3.5 \
- && pip2.7 wheel 'ansible' 'molecule>=2,<3' \
+ && pip2.7 wheel 'ansible' \
+ && pip2.7 wheel 'molecule>=2,<3' \
  && pip2.7 wheel 'passlib>=1.6' 'pexpect>=3.3' \
  && pip2.7 wheel 'ansible>=2.4,<2.5' \
  && pip2.7 wheel 'ansible>=2.3,<2.4' \
