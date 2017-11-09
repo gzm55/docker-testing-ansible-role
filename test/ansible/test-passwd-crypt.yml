@@ -1,0 +1,6 @@
+---
+- hosts: localhost
+  vars_prompt:
+  - name: "test"
+    encrypt: "sha512_crypt"
+  gather_facts: False

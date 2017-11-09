@@ -5,6 +5,7 @@ FROM alpine:3.6
 ## - config offline easy_install package location: /usr/local/share/pip-wheelhouse
 ## - make sure /usr/local/share/pip-wheelhouse exists
 ## - patches for compile python 2.6
+## - ssh pubkeys for public code host services
 ADD content /
 
 ## http://bugs.python.org/issue19846
@@ -19,11 +20,7 @@ ENV LANG C.UTF-8
 ## - pip install/wheel packages for ansible, tox, molecule
 ## - cleanup
 
-## Test cases:
-## - version of python, python{2,3} and python{2.6,2.7,3.5,3.6}
-## - version of pip, pip{2,3} and pip{2.6,2.7,3.5,3.6}
-## - each pip have only pip installed
-## - common ansible test cases
+## TODO Test cases:
 ## - common molecule test cases
 ## - common tox test cases
 
@@ -140,18 +137,12 @@ RUN set -ux \
  && make -j$(getconf _NPROCESSORS_ONLN) \
  && make install \
  && cd / \
-## DEV cache point
-;
-RUN set -ux \
  && rm /usr/local/bin/2to3 \
        /usr/local/bin/idle3 \
        /usr/local/bin/pydoc3 \
        /usr/local/bin/python3 \
        /usr/local/bin/pyvenv \
        /usr/local/share/man/man1/python* \
-## DEV cache point
-;
-RUN set -ux \
  ####
  ## 4. Pin runtime dependends of python 2.6 and 3.5
  && rm -rf /usr/src \
@@ -179,9 +170,6 @@ RUN set -ux \
  && mkdir -p /usr/local/share/pip-wheelhouse \
  && python2.6 get-pip.py --disable-pip-version-check --no-wheel 'pip==9.0.1' \
  && pip2.6 install --no-cache-dir --upgrade --force-reinstall pip 'wheel<0.30' \
-## DEV cache point
-;
-RUN set -ux \
  && python3.5 get-pip.py --disable-pip-version-check --no-wheel 'pip==9.0.1' \
  && apk add --no-progress py3-pip py2-pip \
  && pip3.5 install --no-cache-dir --upgrade --force-reinstall pip wheel \
@@ -257,9 +245,6 @@ RUN set -ux \
  && find /usr/local/bin/ -depth \
                          \( \( -type f -o -type l \) -a \( -name 'python2*-config' -o -name 'python-config' \) \) \
                          -delete \
-## DEV cache point
-;
-RUN set -ux \
  ####
  ## 10. In python 3.5 environment
  ##     - wheel ansible: 2.4, 2.3, 2.2
