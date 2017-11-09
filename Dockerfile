@@ -59,7 +59,7 @@ RUN set -ux \
  && : for 3.5 && gpg --keyserver keyserver.ubuntu.com --recv-keys '97FC712E4C024BBEA48A61ED3A5CA953F73C700D' \
  && gpg --batch --verify python-2.6.tar.xz.asc python-2.6.tar.xz \
  && gpg --batch --verify python-3.5.tar.xz.asc python-3.5.tar.xz \
- && rm -r "$GNUPGHOME" python*.tar.xz.asc \
+ && rm -rf "$GNUPGHOME" python*.tar.xz.asc \
  && unset GNUPGHOME \
  && mkdir -p /usr/src/python-2.6 /usr/src/python-3.5 \
  && tar -xJC /usr/src/python-2.6 --strip-components=1 -f python-2.6.tar.xz \
