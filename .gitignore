@@ -5,3 +5,12 @@
 /content/python-2.6.tar.xz.asc
 /content/python-3.5.tar.xz
 /content/python-3.5.tar.xz.asc
+
+.tox/
+
+# Created by https://www.gitignore.io/api/ansible
+
+### Ansible ###
+*.retry
+
+# End of https://www.gitignore.io/api/ansible
