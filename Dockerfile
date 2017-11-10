@@ -188,7 +188,7 @@ RUN set -ux \
  ##    - wheel and install passlib>=1.6, for crypt/hash password in ansible
  ##    - wheel and install pexpect>=3.3, for ansible expect module
  ##    - install tox 2.*
- ##    - molecule 2.* now only support python 2.7
+ ##    - molecule 2.* now only support python 2.7, but in most case it supports py{2.6,3.5,3.6}
  && apk add --no-progress --virtual .build-deps-pip2.7 \
                                     linux-headers \
                                     gcc \
@@ -221,6 +221,7 @@ RUN set -ux \
                                     python3-dev \
  && apk del .build-deps-pip2.7 \
  && pip3.6 wheel 'ansible>=2.2' \
+ && pip3.6 wheel 'molecule>=2,<3' \
  && pip3.6 wheel 'passlib>=1.6' 'pexpect>=3.3' \
  && pip3.6 wheel 'ansible>=2.4,<2.5' \
  && pip3.6 wheel 'ansible>=2.3,<2.4' \
@@ -236,6 +237,7 @@ RUN set -ux \
                                     libffi-dev \
  && apk del .build-deps-pip3.6 \
  && pip2.6 wheel 'ansible' \
+ && pip2.6 wheel 'molecule>=2,<3' \
  && pip2.6 wheel 'passlib>=1.6' 'pexpect>=3.3' \
  && pip2.6 wheel 'ansible>=2.4,<2.5' \
  && pip2.6 wheel 'ansible>=2.3,<2.4' \
@@ -257,6 +259,7 @@ RUN set -ux \
                                     libffi-dev \
  && apk del .build-deps-pip2.6 \
  && pip3.5 wheel 'ansible>=2.2' \
+ && pip3.5 wheel 'molecule>=2,<3' \
  && pip3.5 wheel 'passlib>=1.6' 'pexpect>=3.3' \
  && pip3.5 wheel 'ansible>=2.4,<2.5' \
  && pip3.5 wheel 'ansible>=2.3,<2.4' \
