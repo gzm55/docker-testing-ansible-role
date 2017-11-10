@@ -213,6 +213,7 @@ RUN set -ux \
  ## 8. In python 3.6 environment
  ##    - wheel ansible: 2.4, 2.3, 2.2
  && apk add --no-progress --virtual .build-deps-pip3.6 \
+                                    linux-headers \
                                     gcc \
                                     make \
                                     musl-dev \
@@ -230,6 +231,7 @@ RUN set -ux \
  ## 9. In python 2.6 environment
  ##    - wheel ansible: 2.4, 2.3, 2.2
  && apk add --no-progress --virtual .build-deps-pip2.6 \
+                                    linux-headers \
                                     gcc \
                                     make \
                                     musl-dev \
@@ -252,6 +254,7 @@ RUN set -ux \
  ## 10. In python 3.5 environment
  ##     - wheel ansible: 2.4, 2.3, 2.2
  && apk add --no-progress --virtual .build-deps-pip3.5 \
+                                    linux-headers \
                                     gcc \
                                     make \
                                     musl-dev \
