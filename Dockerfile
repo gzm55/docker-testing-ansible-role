@@ -1,4 +1,23 @@
+## Builder stage for copying docker cli
+FROM docker:17.10 as docker-cli
+
+RUN mkdir -p "/output$(dirname -- $(which docker))"
+RUN mkdir -p "/output$(dirname -- $(which modprobe))"
+RUN cp -- "$(which docker)" "/output$(dirname -- $(which docker))"/
+RUN cp -- "$(which modprobe)" "/output$(dirname -- $(which modprobe))"/
+
+## Main image
 FROM alpine:3.6
+
+## http://bugs.python.org/issue19846
+## > At the moment, setting "LANG=C" on a Linux system *fundamentally breaks Python 3*, and that's not OK.
+ENV LANG C.UTF-8
+
+LABEL maintainer="James Z.M. Gao (@gzm55)" \
+      readme.md="https://github.com/gzm55/docker-testing-ansible-role/blob/master/README.md" \
+      description="Docker image for testing ansible roles"
+
+COPY --from=docker-cli /output /
 
 ## Contents
 ## - config offline pip package location: /usr/local/share/pip-wheelhouse
@@ -7,10 +26,6 @@ FROM alpine:3.6
 ## - patches for compile python 2.6
 ## - ssh pubkeys for public code host services
 ADD content /
-
-## http://bugs.python.org/issue19846
-## > At the moment, setting "LANG=C" on a Linux system *fundamentally breaks Python 3*, and that's not OK.
-ENV LANG C.UTF-8
 
 ## Overrall building steps:
 ## - init system
@@ -187,6 +202,7 @@ RUN set -ux \
  ##    - wheel and install molecule 2.*
  ##    - wheel and install passlib>=1.6, for crypt/hash password in ansible
  ##    - wheel and install pexpect>=3.3, for ansible expect module
+ ##    - wheel and install docker-py
  ##    - install tox 2.*
  ##    - molecule 2.* now only support python 2.7, but in most case it supports py{2.6,3.5,3.6}
  && apk add --no-progress --virtual .build-deps-pip2.7 \
@@ -200,18 +216,23 @@ RUN set -ux \
                                     python2-dev \
  && apk del .build-deps-py3.5 \
  && pip2.7 wheel 'ansible' \
- && pip2.7 wheel 'molecule>=2,<3' \
- && pip2.7 wheel 'passlib>=1.6' 'pexpect>=3.3' \
  && pip2.7 wheel 'ansible>=2.4,<2.5' \
  && pip2.7 wheel 'ansible>=2.3,<2.4' \
  && pip2.7 wheel 'ansible>=2.2,<2.3' \
+ && pip2.7 wheel 'molecule>=2,<3' 'docker-py' \
+ && pip2.7 wheel 'passlib>=1.6' 'pexpect>=3.3' \
  && pip2.7 install --no-index 'molecule>=2,<3' \
                               'passlib>=1.6' \
                               'pexpect>=3.3' \
+                              'docker-py' \
  && pip2.7 install 'tox>=2,<3' \
  ####
  ## 8. In python 3.6 environment
  ##    - wheel ansible: 2.4, 2.3, 2.2
+ ##    - wheel molecule 2.*
+ ##    - wheel passlib>=1.6
+ ##    - wheel pexpect>=3.3
+ ##    - wheel docker-py
  && apk add --no-progress --virtual .build-deps-pip3.6 \
                                     linux-headers \
                                     gcc \
@@ -222,14 +243,18 @@ RUN set -ux \
                                     python3-dev \
  && apk del .build-deps-pip2.7 \
  && pip3.6 wheel 'ansible>=2.2' \
- && pip3.6 wheel 'molecule>=2,<3' \
- && pip3.6 wheel 'passlib>=1.6' 'pexpect>=3.3' \
  && pip3.6 wheel 'ansible>=2.4,<2.5' \
  && pip3.6 wheel 'ansible>=2.3,<2.4' \
  && pip3.6 wheel 'ansible>=2.2,<2.3' \
+ && pip3.6 wheel 'molecule>=2,<3' 'docker-py' \
+ && pip3.6 wheel 'passlib>=1.6' 'pexpect>=3.3' \
  ####
  ## 9. In python 2.6 environment
  ##    - wheel ansible: 2.4, 2.3, 2.2
+ ##    - wheel molecule 2.*
+ ##    - wheel passlib>=1.6
+ ##    - wheel pexpect>=3.3
+ ##    - wheel docker-py
  && apk add --no-progress --virtual .build-deps-pip2.6 \
                                     linux-headers \
                                     gcc \
@@ -239,11 +264,11 @@ RUN set -ux \
                                     libffi-dev \
  && apk del .build-deps-pip3.6 \
  && pip2.6 wheel 'ansible' \
- && pip2.6 wheel 'molecule>=2,<3' \
- && pip2.6 wheel 'passlib>=1.6' 'pexpect>=3.3' \
  && pip2.6 wheel 'ansible>=2.4,<2.5' \
  && pip2.6 wheel 'ansible>=2.3,<2.4' \
  && pip2.6 wheel 'ansible>=2.2,<2.3' \
+ && pip2.6 wheel 'molecule>=2,<3' 'docker-py' \
+ && pip2.6 wheel 'passlib>=1.6' 'pexpect>=3.3' \
  && find /usr/local/include/python2.6/ -depth \
                                        \( ! -type f -o ! -name 'pyconfig.h' \) \
                                        -delete \
@@ -253,6 +278,10 @@ RUN set -ux \
  ####
  ## 10. In python 3.5 environment
  ##     - wheel ansible: 2.4, 2.3, 2.2
+ ##     - wheel molecule 2.*
+ ##     - wheel passlib>=1.6
+ ##     - wheel pexpect>=3.3
+ ##     - wheel docker-py
  && apk add --no-progress --virtual .build-deps-pip3.5 \
                                     linux-headers \
                                     gcc \
@@ -262,11 +291,11 @@ RUN set -ux \
                                     libffi-dev \
  && apk del .build-deps-pip2.6 \
  && pip3.5 wheel 'ansible>=2.2' \
- && pip3.5 wheel 'molecule>=2,<3' \
- && pip3.5 wheel 'passlib>=1.6' 'pexpect>=3.3' \
  && pip3.5 wheel 'ansible>=2.4,<2.5' \
  && pip3.5 wheel 'ansible>=2.3,<2.4' \
  && pip3.5 wheel 'ansible>=2.2,<2.3' \
+ && pip3.5 wheel 'molecule>=2,<3' 'docker-py' \
+ && pip3.5 wheel 'passlib>=1.6' 'pexpect>=3.3' \
  && find /usr/local/include/python3.5m/ -depth \
                                         \( ! -type f -o ! -name 'pyconfig.h' \) \
                                         -delete \
@@ -274,13 +303,13 @@ RUN set -ux \
                          \( \( -type f -o -type l \) -a -name 'python3*-config' \) \
                          -delete \
  ####
- ## 10. Install ansible runtime deps
+ ## 11. Install ansible runtime deps
  && apk add --no-progress openssh-client \
                           sshpass \
                           git \
  && apk del .build-deps-pip3.5 \
  ####
- ## 11. Cleanup
+ ## 12. Cleanup
  ##     - remove python compiled files
  ##     - remove python module tests, but keep ansible `test' plugin
  ##     - remove system caches
