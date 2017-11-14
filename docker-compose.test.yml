@@ -3,3 +3,4 @@ sut:
   command: /test/test-all.sh
   volumes:
   - ./test:/test
+  - /var/run/docker.sock:/var/run/docker.sock:ro
