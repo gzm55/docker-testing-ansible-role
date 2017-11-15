@@ -267,7 +267,7 @@ RUN set -ux \
  && pip2.6 wheel 'ansible>=2.4,<2.5' \
  && pip2.6 wheel 'ansible>=2.3,<2.4' \
  && pip2.6 wheel 'ansible>=2.2,<2.3' \
- && pip2.6 wheel 'molecule>=2,<3' 'docker-py' \
+ && pip2.6 wheel 'py<1.5' 'molecule>=2,<3' 'docker-py' \
  && pip2.6 wheel 'passlib>=1.6' 'pexpect>=3.3' \
  && find /usr/local/include/python2.6/ -depth \
                                        \( ! -type f -o ! -name 'pyconfig.h' \) \
