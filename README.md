@@ -22,6 +22,7 @@ cd /path/to/project/
 docker run -it \
            --rm \
            -v `pwd`:/code \
+           -v /var/run/docker.sock:/var/run/docker.sock:ro \
            -w /code \
            gzm55/testing-ansible-role molecule test
 ```
