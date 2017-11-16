@@ -251,10 +251,12 @@ RUN set -ux \
  ####
  ## 9. In python 2.6 environment
  ##    - wheel ansible: 2.4, 2.3, 2.2
- ##    - wheel molecule 2.*
+ ##    - wheel molecule 2.* (limit py<1.5)
  ##    - wheel passlib>=1.6
  ##    - wheel pexpect>=3.3
  ##    - wheel docker-py
+ ##
+ ##    Note: py 1.5 drops support of python 2.6
  && apk add --no-progress --virtual .build-deps-pip2.6 \
                                     linux-headers \
                                     gcc \
