@@ -1,5 +1,5 @@
 ## Builder stage for copying docker cli
-FROM docker:17.10 as docker-cli
+FROM docker:18.01 as docker-cli
 
 RUN mkdir -p "/output$(dirname -- $(which docker))"
 RUN mkdir -p "/output$(dirname -- $(which modprobe))"
@@ -7,7 +7,7 @@ RUN cp -- "$(which docker)" "/output$(dirname -- $(which docker))"/
 RUN cp -- "$(which modprobe)" "/output$(dirname -- $(which modprobe))"/
 
 ## Main image
-FROM alpine:3.6
+FROM alpine:3.7
 
 ## http://bugs.python.org/issue19846
 ## > At the moment, setting "LANG=C" on a Linux system *fundamentally breaks Python 3*, and that's not OK.
@@ -63,10 +63,10 @@ RUN set -ux \
       || wget -O python-2.6.tar.xz.asc 'https://www.python.org/ftp/python/2.6.9/Python-2.6.9.tar.xz.asc'; \
     } \
  && { [ -f python-3.5.tar.xz ] \
-      || wget -O python-3.5.tar.xz     'https://www.python.org/ftp/python/3.5.4/Python-3.5.4.tar.xz'; \
+      || wget -O python-3.5.tar.xz     'https://www.python.org/ftp/python/3.5.5/Python-3.5.5.tar.xz'; \
     } \
  && { [ -f python-3.5.tar.xz.asc ] \
-      || wget -O python-3.5.tar.xz.asc 'https://www.python.org/ftp/python/3.5.4/Python-3.5.4.tar.xz.asc'; \
+      || wget -O python-3.5.tar.xz.asc 'https://www.python.org/ftp/python/3.5.5/Python-3.5.5.tar.xz.asc'; \
     } \
  && wget -O get-pip.py "https://bootstrap.pypa.io/get-pip.py" \
  && export GNUPGHOME="$(mktemp -d)" \
@@ -176,6 +176,8 @@ RUN set -ux \
  ##    - install apk packages last, this can fix the default link of pip, pip2, pip3
  ##    - wheel 0.30 removed support for 2.6
  ##      ref: https://github.com/pypa/wheel/blob/7ca7b3552e55030b5d78cd90d53f1d99c9139f16/CHANGES.txt#L15
+ ##    - setuptools 37.0 removed support for 2.6
+ ##      ref: https://setuptools.readthedocs.io/en/latest/history.html#v37-0-0
  ##    - we use "--force-reinstall" for the case where the version of
  ##      pip we're trying to install is the same as the version bundled
  ##      with Python ("Requirement already up-to-date: pip==8.1.2 in
@@ -183,8 +185,8 @@ RUN set -ux \
  ##      ref: https://github.com/docker-library/python/pull/143#issuecomment-241032683
  ##    - pip2.6 will remove pip3.5, so update it first
  && mkdir -p /usr/local/share/pip-wheelhouse \
- && python2.6 get-pip.py --disable-pip-version-check --no-wheel 'pip==9.0.1' \
- && pip2.6 install --no-cache-dir --upgrade --force-reinstall pip 'wheel<0.30' \
+ && python2.6 get-pip.py --disable-pip-version-check --no-wheel --no-setuptools 'pip==9.0.1' \
+ && pip2.6 install --no-cache-dir --upgrade --force-reinstall pip 'setuptools<37dev' 'wheel<0.30' \
  && python3.5 get-pip.py --disable-pip-version-check --no-wheel 'pip==9.0.1' \
  && apk add --no-progress py3-pip py2-pip \
  && pip3.5 install --no-cache-dir --upgrade --force-reinstall pip wheel \
@@ -250,8 +252,8 @@ RUN set -ux \
  && pip3.6 wheel 'passlib>=1.6' 'pexpect>=3.3' \
  ####
  ## 9. In python 2.6 environment
- ##    - wheel ansible: 2.4, 2.3, 2.2
- ##    - wheel molecule 2.* (limit py<1.5)
+ ##    - wheel ansible: 2.4, 2.3, 2.2 (limit setuptools<37)
+ ##    - wheel molecule 2.* (limit setuptools<37, pytest<3.3, py<1.5)
  ##    - wheel passlib>=1.6
  ##    - wheel pexpect>=3.3
  ##    - wheel docker-py
@@ -265,11 +267,11 @@ RUN set -ux \
                                     openssl-dev \
                                     libffi-dev \
  && apk del .build-deps-pip3.6 \
- && pip2.6 wheel 'ansible' \
- && pip2.6 wheel 'ansible>=2.4,<2.5' \
- && pip2.6 wheel 'ansible>=2.3,<2.4' \
- && pip2.6 wheel 'ansible>=2.2,<2.3' \
- && pip2.6 wheel 'py<1.5' 'molecule>=2,<3' 'docker-py' \
+ && pip2.6 wheel 'setuptools<37dev' 'ansible' \
+ && pip2.6 wheel 'setuptools<37dev' 'ansible>=2.4,<2.5' \
+ && pip2.6 wheel 'setuptools<37dev' 'ansible>=2.3,<2.4' \
+ && pip2.6 wheel 'setuptools<37dev' 'ansible>=2.2,<2.3' \
+ && pip2.6 wheel 'setuptools<37dev' 'pytest<3.3.0' 'py<1.5' 'molecule>=2,<3' 'docker-py' \
  && pip2.6 wheel 'passlib>=1.6' 'pexpect>=3.3' \
  && find /usr/local/include/python2.6/ -depth \
                                        \( ! -type f -o ! -name 'pyconfig.h' \) \
