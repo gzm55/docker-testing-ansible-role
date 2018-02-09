@@ -1,5 +1,8 @@
+.*
+docker-compose.test.yml
 content-dev
 test
 *.md
+*.sh
 *.xz
 *.asc

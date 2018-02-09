@@ -57,3 +57,11 @@ ansible will make the role compatible for py26.
 If a role has python module/filter codes, and we _really_ can and need to keep support py26,
 first run some UT on these codes for py26,
 then when E2E test python modules, also select docker images only with python 2.6.
+
+## TODO
+
+- re-produce the kernel api call of localtime() for musl
+- set TZ=:/etc/localtime if needed
+- add cmd for print-entering-script
+- entering-script support linux and mac
+- pathenv PATHON* from https://docs.python.org/2.6/using/cmdline.html
